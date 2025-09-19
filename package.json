@@ -1,6 +1,6 @@
 {
   "name": "auto-update",
-  "version": "0.1.6",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -10,7 +10,8 @@
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
-    "electron:build/win": "NODE_OPTIONS=--openssl-legacy-provider vue-cli-service electron:build --win"
+    "electron:build/win": "NODE_OPTIONS=--openssl-legacy-provider vue-cli-service electron:build --win",
+    "electron:build-win/reliease": "NODE_OPTIONS=--openssl-legacy-provider vue-cli-service electron:build --win --publish always"
   },
   "main": "background.js",
   "repository": {

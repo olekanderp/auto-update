@@ -33,7 +33,6 @@ async function createWindow() {
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
-      autoUpdater.checkForUpdatesAndNotify()
     if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
     createProtocol('app')
@@ -90,26 +89,56 @@ if (isDevelopment) {
 
 
 
- function initLogUpdate() {
-     autoUpdater.on('checking-for-update', () => {
-         console.log('11 Checking for update...')
-     })
-     autoUpdater.on('update-available', (info) => {
-         console.log('22 Update available.', info)
-     })
-     autoUpdater.on('update-not-available', (info) => {
-         console.log('33 Update not available.', info)
-     })
-     autoUpdater.on('error', (err) => {
-         console.error('44 Error in auto-updater:', err)
-     })
-     autoUpdater.on('download-progress', (progress) => {
-         console.log(`55 Download speed: ${progress.bytesPerSecond}, Downloaded ${progress.percent}%`)
-     })
-     autoUpdater.on('update-downloaded', (info) => {
-         console.log('66 Update downloaded', info)
-         // Можна примусово перезапустити
-         autoUpdater.quitAndInstall()
-     })
+function initLogUpdate() {
+    autoUpdater.on('checking-for-update', () => {
+        console.log('11 Checking for update...')
+        showUpdateWindow('Checking for update...')
+    })
+    autoUpdater.on('update-available', (info) => {
+        console.log('22 Update available.', info)
+        showUpdateWindow(`Update available: ${info.version}`)
+    })
+    autoUpdater.on('update-not-available', (info) => {
+        console.log('33 Update not available.', info)
+        showUpdateWindow('No updates found')
+    })
+    autoUpdater.on('error', (err) => {
+        console.error('44 Error in auto-updater:', err)
+        showUpdateWindow(`Error: ${err.message}`)
+    })
+    autoUpdater.on('download-progress', (progress) => {
+        console.log(`55 Download speed: ${progress.bytesPerSecond}, Downloaded ${progress.percent}%`)
+        showUpdateWindow(`Downloading: ${Math.round(progress.percent)}%`)
+    })
+    autoUpdater.on('update-downloaded', (info) => {
+        console.log('66 Update downloaded', info)
+        showUpdateWindow('Update downloaded. Restarting...')
+        autoUpdater.quitAndInstall()
+    })
+}
 
- }
+
+
+function showUpdateWindow(message) {
+    const win = new BrowserWindow({
+        width: 400,
+        height: 150,
+        title: 'AutoUpdater Status',
+        alwaysOnTop: true,
+        frame: true,
+        resizable: false,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        }
+    })
+
+    // Виводимо простий HTML із повідомленням
+    win.loadURL('data:text/html;charset=utf-8,' +
+        encodeURIComponent(`<h3>${message}</h3>`))
+
+    // Закриваємо вікно автоматично через 3 секунди
+    setTimeout(() => {
+        if (!win.isDestroyed()) win.close()
+    }, 3000)
+}
