@@ -16,7 +16,7 @@
   "main": "background.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/olekanderp/electronTest.git"
+    "url": "https://github.com/olekanderp/auto-update.git"
   },
   "dependencies": {
     "core-js": "^3.8.3",
